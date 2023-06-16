@@ -1,18 +1,11 @@
-from flask import Flask, render_template, redirect
-import warnings
-warnings.filterwarnings('ignore')
-import speech_recognition as sr
 import pyttsx3
 import pywhatkit
 import datetime
 import pyjokes
 import wikipedia
 import sys
-import requests, json 
-
-listener = sr.Recognizer()
-
-app = Flask("__name__")
+import requests
+import webbrowser
 
 def engine_talk(text):
     engine = pyttsx3.init()
@@ -20,17 +13,6 @@ def engine_talk(text):
     engine.setProperty('voice', voices[1].id)
     engine.say(text)
     engine.runAndWait()
-
-def user_commands():
-    try:
-        with sr.Microphone() as source:
-            voice = listener.listen(source)
-            command = listener.recognize_google(voice)
-            command = command.lower()
-            command = command.replace('alexa', '')
-    except:
-        pass
-    return command
 
 def weather(city):
     api_key = "b2dc8435b1235cbd6d7e246fa03b268a"
@@ -44,13 +26,22 @@ def weather(city):
         current_temperature = y["temp"] 
         temp_in_celcius = current_temperature - 273.15
         return str(int(temp_in_celcius))
+    
 
-def run_alexa():
-    command = user_commands()
+def run_alexa(command):
+
     if 'play a song' in command:
         song = 'Arijit Singh'
         engine_talk('Playing some music')
         pywhatkit.playonyt(song)
+    elif 'open youtube' in command:
+        webbrowser.open("youtube.com")
+
+    elif 'open google' in command:
+        webbrowser.open("google.com")
+
+    elif 'open facebook' in command:
+        webbrowser.open("facebook.com")
     elif 'play' in command:
         song = command.replace('play', '')
         engine_talk('Playing....' + song)
@@ -73,16 +64,3 @@ def run_alexa():
         sys.exit()
     else:
         engine_talk("I didn't hear you properly")
-
-@app.route('/')
-def hello():
-    return render_template("index.html")
-
-@app.route("/", methods=['POST', 'GET'])
-def submit():
-    while True:
-        run_alexa()
-    return render_template("index.html")
-
-if __name__ == "__main__":
-    app.run(debug=True)
