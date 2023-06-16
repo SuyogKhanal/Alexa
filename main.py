@@ -16,5 +16,5 @@ def submit():
     return render_template('index.html', speech_result=speech_result)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True,port=80)
 
